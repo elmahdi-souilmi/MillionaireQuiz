@@ -2,63 +2,111 @@ const adminModel = require('../models/admin.model')
 const participant = require('../models/participant.model')
 const questionModel = require('../models/question.model')
 const giftModel = require('../models/gift.model')
+const jwt = require('jsonwebtoken')
+const logger = require('../config/logger')
 //log in admin
 function logInAdmin(req, res) {
+
     adminModel.findOne({
         phoneNumber: `${req.body.phoneNumber}`,
         password: `${req.body.password}`
-    }).then((admin) => {
-        if (admin === null) {
-            res.json({
-                "message": "login or password incorect"
+    }).then((Admin) => {
+        if (Admin != null) {
+            let token = jwt.sign({
+                phoneNumber: Admin.phoneNumber,
+                password: Admin.password
+            }, "AdminSecret", {
+                expiresIn: '60s'
             })
-        } else 
-        res.json(admin)
+
+            logger.info('addmin with phone number: ' + Admin.phoneNumber + ' logged in');
+            res.json({
+                "token": token
+            })
+        } else {
+            logger.error('addmin with phone number: ' + req.body.phoneNumber + ' not found');
+            res.json({
+
+                "message": "user not found"
+            })
+        }
     }).catch((error) => {
         res.json(error)
     })
 }
 // validate participant account 
 function activateAccount(req, res) {
-    participant.findOneAndUpdate({
-        email: req.params.mail
-    }, {
-        $set: {
-            is_valid: true,
-            age:32
-        },
-    }).then((succes) => {
-      if (succes){
-          res.json({"message":"the account activated !!"})
-      }else
-        res.json({
-            "message": "something went wrong !!"
-        })
-    }).catch((error) => {
-        res.json(error)
+    jwt.verify(req.token, 'AdminSecret', (err, authData) => {
+        if (err) {
+            res.sendStatus(403);
+        } else {
+            participant.findOneAndUpdate({
+                email: req.params.mail
+            }, {
+                $set: {
+                    is_valid: true
+                },
+            }).then((succes) => {
+                if (succes) {
+                    logger.info('account activated');
+                    res.json({
+                        "message": " The account activated !!",
+                        "fortest": authData
+                    })
+                } else {
+                    logger.info('account not activated');
+                    res.json({
+                        "message": "Something went wrong !!"
+
+                    })
+                }
+            }).catch((error) => {
+                res.json(error)
+            })
+        }
     })
+
 }
 // add questions
-function addQuestions(req,res) {
-    let question = {
-        question: req.body.question,
-        right_answer:req.body.right_answer,
-        false_answer: req.body.false_answer,
-        pionts: req.body.pionts
-    };
-    questionModel.questionModel.create(question).then((result) => {
-            res.json(result)
+function addQuestions(req, res) {
+    jwt.verify(req.token, 'AdminSecret', (err, authData) => {
+        if (err) {
+            res.sendStatus(403);
+        } else {
+            let question = {
+                question: req.body.question,
+                right_answer: req.body.right_answer,
+                false_answer: req.body.false_answer,
+                pionts: req.body.pionts
+            };
+            questionModel.questionModel.create(question).then((result) => {
+                logger.info('question added');
+                res.json(result)
+            })
+        }
     })
+
 }
 // add gift
 function addgift(req, res) {
-    let gift = {
-        Name: req.body.Name,
-        image: req.body.image,
-    };
-    giftModel.giftModel.create(gift).then((result) => {
-        res.json(result)
+    jwt.verify(req.token, 'AdminSecret', (err, authData) => {
+        if (err) {
+            res.sendStatus(403);
+        } else {
+            let gift = {
+                Name: req.body.Name,
+                image: req.body.image,
+            };
+            giftModel.giftModel.create(gift).then((gift) => {
+                logger.info('gift added');
+                res.json({
+                    "gift added": gift,
+                    "fortest": authData
+                })
+            })
+        }
     })
+
 }
 module.exports = {
     logInAdmin,

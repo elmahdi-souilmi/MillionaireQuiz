@@ -39,6 +39,24 @@ function saveanswer(req, res) {
     })
   )
 }
+// push an answer to answers collection
+async function pushanswer(req, res) {
+  let answer = {
+    idquestion: req.body.idquestion,
+    reponse: req.body.reponse,
+  };
+  let reponse = await reponseModel.findOne({
+    "idRound": req.body.idRound,
+    "idparticipant": req.body.idparticipant
+  }).then((data) => {
+    return data
+  })
+  reponse.answers.push(answer)
+  reponse.save();
+  res.json({
+      "updated": reponse
+    })
+}
 // update the pionts 
 async function updatepionts(req, res) {
   let rightQuestionArray = []
@@ -57,38 +75,37 @@ async function updatepionts(req, res) {
   }
   for (let i = 0; i < participantsArray.length; i++) {
     let score = 0;
+    console.log(participantsArray[i]);
     let participantansers = await reponseModel.findOne({
-      idparticipant: "603045bafdb13f5ab440fd01",
+      idparticipant: participantsArray[i],
       "idRound": req.body.idround
-    }).then((answer)=>{
+    }).then((answer) => {
       return answer.answers;
-      })
+    })
     for (let y = 0; y < participantansers.length; y++) {
       if (participantansers[y].reponse == rightQuestionArray[y]) {
         score += 10
       }
     }
     let round = await roundModel.roundModel.findById(req.body.idround).then((round) => {
-     return round
-     //.group.participants.find(participant => participant._id == "603045bafdb13f5ab440fd01")
+      return round
+      //.group.participants.find(participant => participant._id == "603045bafdb13f5ab440fd01")
     })
-    round.group.participants.id("603045bafdb13f5ab440fd01").points = score
+    round.group.participants.id(participantsArray[i]).points = score
     //participant.points = score;
     await round.save(function (err) {
-      // emmbeded comment with author updated     
-    });
-
-    //participant.save();
+      // emmbeded pionts with round updated     
+    }); //participant.save();
     console.log(participant)
-  }
-
-  //console.log(rightQuestionArray)
+  } //console.log(rightQuestionArray)
   res.json(participantsArray)
 }
+// show the winner 
 
 module.exports = {
   startRound,
-  showQuestion,
+  showQuestion, 
+  pushanswer,
   saveanswer,
   updatepionts
 };

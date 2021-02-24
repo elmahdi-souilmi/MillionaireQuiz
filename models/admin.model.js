@@ -15,11 +15,11 @@ const admin = new Schema({
     },
 });
 const adminModel = mongoose.model("admin", admin);
-// let carda = {
+// let admin = {
 
 //     FullName: "souilmi elmahdi",
 //     phoneNumber: "0696235668",
 //     password: "123456789"
 // };
-// adminModel.create(carda)
+// adminModel.create(admin)
 module.exports = adminModel;

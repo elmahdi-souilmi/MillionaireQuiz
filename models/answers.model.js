@@ -21,11 +21,9 @@ const reponse = new Schema({
     },
     time: {
         type: Number,
-        required: true,
     },
     answers:{
         type: [answers]
-
     }
 });
 const reponseModel = mongoose.model("reponse", reponse);
