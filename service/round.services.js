@@ -48,17 +48,7 @@ function createround() {
                 let round = {
                     group: group,
                     questions: questionsfunction(),
-                    //  {
-                    //     question: "q1",
-                    //     right_answer: "r1",
-                    //     false_answer: ["r2", "r3", "r4"],
-                    //     pionts: 10
-                    // },
                     gift: giftfunction(),
-                    //  {
-                    //     Name: "gift1",
-                    //     image: "image"
-                    // },
                     winner: {
                         fullName: "elmahdi souilmi",
                         age: 23,
