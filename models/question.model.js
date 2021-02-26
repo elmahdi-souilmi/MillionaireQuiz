@@ -18,7 +18,7 @@ const question = new Schema({
     pionts: {
         type: Number,
         required: true,
-    },
+    }
 
 });
 question.plugin(random);

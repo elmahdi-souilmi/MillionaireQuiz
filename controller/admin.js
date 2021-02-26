@@ -4,6 +4,7 @@ const questionModel = require('../models/question.model')
 const giftModel = require('../models/gift.model')
 const jwt = require('jsonwebtoken')
 const logger = require('../config/logger')
+require('dotenv').config();
 //log in admin
 function logInAdmin(req, res) {
 
@@ -15,11 +16,11 @@ function logInAdmin(req, res) {
             let token = jwt.sign({
                 phoneNumber: Admin.phoneNumber,
                 password: Admin.password
-            }, "AdminSecret", {
-                expiresIn: '60s'
+            }, process.env.ADMINAPISECRET, {
+                expiresIn: process.env.JWTTIMEOUT
             })
 
-            logger.info('addmin with phone number: ' + Admin.phoneNumber + ' logged in');
+            logger.info('admin with phone number: ' + Admin.phoneNumber + ' logged in');
             res.json({
                 "token": token
             })
@@ -36,7 +37,7 @@ function logInAdmin(req, res) {
 }
 // validate participant account 
 function activateAccount(req, res) {
-    jwt.verify(req.token, 'AdminSecret', (err, authData) => {
+    jwt.verify(req.token, process.env.ADMINAPISECRET, (err, authData) => {
         if (err) {
             res.sendStatus(403);
         } else {
@@ -69,7 +70,7 @@ function activateAccount(req, res) {
 }
 // add questions
 function addQuestions(req, res) {
-    jwt.verify(req.token, 'AdminSecret', (err, authData) => {
+    jwt.verify(req.token, process.env.ADMINAPISECRET, (err, authData) => {
         if (err) {
             res.sendStatus(403);
         } else {
@@ -89,7 +90,7 @@ function addQuestions(req, res) {
 }
 // add gift
 function addgift(req, res) {
-    jwt.verify(req.token, 'AdminSecret', (err, authData) => {
+    jwt.verify(req.token, process.env.ADMINAPISECRET, (err, authData) => {
         if (err) {
             res.sendStatus(403);
         } else {

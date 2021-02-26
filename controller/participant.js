@@ -4,9 +4,8 @@ const crypto = require('crypto');
 const jwt = require('jsonwebtoken')
 const sendSms = require('../service/sendSms')
 const sendmail = require('../service/sendMail')
-const {
-    error
-} = require('console');
+require('dotenv').config();
+console.log(process.env.PARTICIPANTSECRET);
 //log in participant
 function logInparticipant(req, res) {
     participantModel.participantModel.findOne({
@@ -17,8 +16,8 @@ function logInparticipant(req, res) {
             let token = jwt.sign({
                 name: participant.email,
                 password: participant.password
-            }, "ParticipantSecret", {
-                expiresIn: '20s'
+            }, process.env.PARTICIPANTSECRET, {
+                expiresIn: process.env.JWTTIMEOUT
             })
             logger.info('participant with the email: ' + participant.email + 'just logged in');
             res.json({
@@ -51,14 +50,16 @@ function signUpParticipant(req, res) {
 
         //call email sender
         sendmail(result.fullName)
-        res.json(result)
+        res.json({"message":"user created"})
     }).catch((error) => {
-        res.json(error)
+        res.json(error, {
+            "message": "created did not created"
+        })
     })
 }
 // create a groupe
 async function createGroup(req, res) {
-    jwt.verify(req.token, 'ParticipantSecret', async (err, authData) => {
+    jwt.verify(req.token, process.env.PARTICIPANTSECRET, async (err, authData) => {
         if (err) {
             res.sendStatus(403);
         } else {
@@ -82,7 +83,7 @@ async function createGroup(req, res) {
 }
 // join a group 
 async function joinGroup(req, res) {
-    jwt.verify(req.token, 'ParticipantSecret', async (err, authData) => {
+    jwt.verify(req.token, process.env.PARTICIPANTSECRET, async (err, authData) => {
         if (err) {
             res.sendStatus(403);
         } else {

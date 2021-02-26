@@ -1,17 +1,17 @@
 const nodemailer = require('nodemailer');
-
+require('dotenv').config();
 function sendmail(fullName) {
     const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
-            user: 'mahdisouilmi95@gmail.com',
-            pass: '**********'
+            user: process.env.EMAIL,
+            pass: process.env.PASS
         }
     });
 
     const mailOptions = {
-        from: 'mahdisouilmi95@gmail.com',
-        to: 'mahdisouilmi95@gmail.com',
+        from: process.env.EMAIL,
+        to: process.env.EMAIL,
         subject: 'new account to validate',
         text: 'hello Elmahdi, ' + fullName + ' waiting for you to validate his account'
     };

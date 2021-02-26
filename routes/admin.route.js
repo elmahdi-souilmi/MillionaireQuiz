@@ -14,7 +14,7 @@ router.put('/:mail', verifyToken, (res, req) => {
 router.post('/addQuestion', verifyToken, (res, req) => {
     admin.addQuestions(res, req)
 })
-// add gift 
+//add gift 
 router.post('/addgift', verifyToken, (res, req) => {
     admin.addgift(res, req)
 })
